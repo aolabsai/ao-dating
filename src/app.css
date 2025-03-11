@@ -1,0 +1,429 @@
+body {
+  font-family: Arial, sans-serif;
+  margin: 0;
+  padding: 0;
+  color: #333;
+  line-height: 1.6;
+  background: linear-gradient(to bottom, #8b49c9, #990ac5);
+}
+
+main {
+  min-height: 100vh;
+  padding: 20px;
+}
+
+#explainer_text {
+  padding: 5rem;
+}
+
+#rainbow_header {
+  background: linear-gradient(to right, red, orange, rgb(190, 190, 91), green, blue, indigo, violet);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  padding: 1rem;
+  text-align: center;
+}
+
+@media (max-width: 600px) {
+  #rainbow_header {
+    font-size: 1.5rem;
+  }
+  #grey_small_header {
+    font-size: 0.5rem;
+  }
+  h1 {
+    font-size: 1rem;
+  }
+  p {
+    font-size: 0.8rem;
+  }
+  #main_button {
+    font-size: 0.6rem;
+  }
+}
+
+#banner {
+  width: 100%;
+  background-color: #76c8e6; 
+  color: rgb(0, 0, 0);
+  text-align: center;
+  line-height: 15px; 
+  position: fixed; 
+}
+
+#savedProducts  {
+  padding: 1.5rem;
+}
+
+#divider_between_saved_products {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: gray;
+  padding: 1rem;
+  text-align: center;
+  font-size: 20px;
+  position: relative;
+}
+
+#divider_between_saved_products::before,
+#divider_between_saved_products::after {
+  content: '';
+  flex: 1;
+  border-top: 1px solid gray;
+}
+
+#grey_small_header {
+  display: flex;
+  color: gray;
+  padding: 1rem;
+  text-align: center;
+  font-size: 20px;
+}
+
+#grey_small_header::after,
+#grey_small_header::before {
+  content: "";
+  flex: 1;
+  border-bottom: 1px solid gray; /* Adjust line color */
+  margin: 0 10px;
+}
+
+#recommendation_page {
+  text-align: center;
+  padding: 5rem;
+  max-width: 800px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+#nav {
+  float: right;
+  width: 10%;
+}
+
+#nav_button {
+  background-color: transparent;
+  border: none;
+  color: #007bff;
+}
+
+#header_text {
+  max-width: 53rem;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+#login {
+  text-align: center;
+  width: 50%;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+#recommend_product_img {
+  max-width: 75%;
+  max-height: 800px;
+}
+
+#profile_images {
+  max-width: 50%;
+}
+
+#buy_now_link {
+  margin-top: 100px;
+  text-decoration: none;
+  color: rgb(255, 255, 255);
+  background-color: rgb(58, 216, 58);
+  padding: 14px 25px;
+  border-radius: 25px;
+}
+
+#buy_now_link:hover {
+  cursor: pointer;
+  background-color: rgb(28, 102, 28);
+}
+
+#main_button {
+  width: 50%;
+  border-radius: 5%;
+}
+
+#start_page_img {
+  width: 75%;
+}
+
+#create_agent_page {
+  padding: 5px;
+  max-width: 50%;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+#agent_img {
+  max-width: 200px;
+}
+
+#top_left {
+  padding: 1rem;
+  float: left;
+  width: 10%;
+}
+
+h1, h2 {
+  color: #000000;
+  text-align: center;
+}
+
+label {
+  color: #ffffff;
+  display: block;
+  margin: 1rem 0 0.5rem;
+  font-weight: bold;
+}
+
+input[type="email"],
+input[type="text"],
+input[type="number"],
+input[type="password"],
+select {
+  width: 100%;
+  padding: 0.5rem;
+  margin-bottom: 1rem;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  font-size: 1rem;
+}
+
+input[type="range"] {
+  width: 100%;
+}
+
+button {
+  display: inline-block;
+  margin: 0.5rem 0.5rem 0 0;
+  padding: 0.7rem 1.2rem;
+  font-size: 1rem;
+  font-weight: bold;
+  color: #fff;
+  background-color: #007bff;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+button:hover {
+  background-color: #0056b3;
+}
+
+.agent-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  justify-content: center;
+}
+
+.select_agents {
+  max-width: 300px;
+  flex: 1 1 calc(33.333% - 1rem);
+  box-sizing: border-box;
+  padding: 1rem;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  background-color: #f1f1f1;
+  text-align: center;
+}
+
+.select_agents button {
+  width: 100%;
+  background-color: #28a745;
+}
+
+.select_agents button:hover {
+  background-color: #218838;
+}
+
+img {
+  max-width: 100%;
+  height: auto;
+  display: block;
+  margin: 1rem auto;
+  border-radius: 4px;
+}
+
+p {
+  margin: 0.5rem 0;
+  color: white;
+}
+
+span {
+  font-weight: bold;
+}
+
+.back-button {
+  background-color: #6c757d;
+}
+
+.back-button:hover {
+  background-color: #5a6268;
+}
+
+.spinner-container {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  background-color: rgba(255, 255, 255, 0.8);
+  z-index: 9999;
+}
+
+.spinner {
+  border: 6px solid rgba(0, 0, 0, 0.1);
+  border-radius: 50%;
+  border-left-color: #4a90e2;
+  width: 80px;
+  height: 80px;
+  animation: spin 1s linear infinite;
+  margin-top: 1rem;
+}
+
+@keyframes spin {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+/* Additional CSS for Photos, Chat, and Friends */
+
+/* Photo Upload Section */
+.photo-upload {
+  margin: 1rem 0;
+  text-align: center;
+}
+.photo-upload input[type="file"] {
+  margin: 0.5rem;
+  padding: 0.5rem;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  background-color: #fff;
+}
+
+/* Recommended Profile Card (on Main Page) */
+.recommended-profile {
+  border: 1px solid #ccc;
+  padding: 1rem;
+  background-color: rgba(255, 255, 255, 0.2);
+  border-radius: 4px;
+  margin: 1rem auto;
+  max-width: 600px;
+}
+
+.chat-container {
+  border: 1px solid #ccc;
+  padding: 1rem;
+  background-color: #ffffff;
+  border-radius: 4px;
+  margin: 1rem auto;
+  max-width: 600px;
+}
+
+.chat-messages {
+  max-height: 300px;
+  overflow-y: auto;
+  margin-bottom: 1rem;
+  padding: 0.5rem;
+  border: 1px solid #007bff;
+  border-radius: 4px;
+  background-color: #ca2e2e;
+}
+
+.chat-message {
+  margin: 0.5rem;
+  padding: 0.5rem;
+  border-radius: 8px;
+  max-width: 70%;
+  color: #333;
+}
+
+.chat-message.received {
+  text-align: left;
+  background-color: #f9f9f9;
+}
+
+.chat-message.sent {
+  text-align: right;
+  background-color: #e1ffc7;
+  margin-left: auto; /* Pushes the sent messages to the right */
+}
+
+input[type="text"].chat-input {
+  width: 80%;
+  padding: 0.5rem;
+  margin-right: 0.5rem;
+}
+
+/* Friends List Styling */
+.friends-container {
+  max-width: 500px;
+  margin: 2rem auto;
+  padding: 1.5rem;
+  background: #f9f9f9;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.friends-container h1 {
+  text-align: center;
+  margin-bottom: 1.5rem;
+  color: #333;
+  font-size: 1.8rem;
+}
+
+.friend-item {
+  display: flex;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+
+.new-label {
+  background: #e0ffe0;
+  color: #008000;
+  padding: 0.2rem 0.5rem;
+  border-radius: 4px;
+  font-size: 0.8rem;
+  margin-right: 0.8rem;
+}
+
+.friend-button {
+  flex: 1;
+  padding: 0.8rem;
+  font-size: 1rem;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  background: #000000;
+  cursor: pointer;
+  transition: background 0.3s, border-color 0.3s;
+}
+
+.friend-button:hover {
+  background: #f0f0f0;
+  border-color: #999;
+}
+
+/* Profile Update Section */
+.profile-section {
+  max-width: 600px;
+  margin: 1rem auto;
+  padding: 1rem;
+  background-color: rgba(255, 255, 255, 0.2);
+  border-radius: 4px;
+}
