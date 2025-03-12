@@ -34,6 +34,7 @@
     let showProfilePage = false;
     let showFriendsPage = false;
     let showChatScreen = false;
+    let showAutoAdd = false;
 
     let newName = ""; ///when the user changes their name, we need to first pass the old name and then the new name so we can access their row in firebase and delete it
 
@@ -46,7 +47,7 @@
     let allMessages = [];
 
     // Using the same backend endpoint 
-    const baseEndpoint = "https://aodating.onrender.com"; // change to  http://127.0.0.1:5000 for local or https://aodating.onrender.com for staging
+    const baseEndpoint = "http://127.0.0.1:5000"; // change to  http://127.0.0.1:5000 for local or https://aodating.onrender.com for staging
   
     function handlePhoto0Upload(event) {
         photo0= event.target.files[0];
@@ -252,6 +253,18 @@ async function updateProfile() {
         console.log("user info: ", user_info)
 
     }
+    async function autoAdd() {
+      const data =  {
+        email:email
+      }
+      const response = await fetch (`${baseEndpoint}/autoAdd`, {
+        method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(data),
+      })
+      const result = await response.json();
+      console.log(result.data)
+    }
 
     async function retrieveChats(scroll=false) {
       if (showChatScreen) { 
@@ -412,6 +425,7 @@ async function updateProfile() {
           showProfilePage = false;
           showFriendsPage = false;
           showChatScreen = false;
+          showAutoAdd = false;
         }}>
           Logout
         </button>
@@ -420,6 +434,7 @@ async function updateProfile() {
           showMainPage = false;
           showFriendsPage = false;
           showChatScreen = false;
+          showAutoAdd = false;
           getUserData()
           profileChanged = true
         }}>
@@ -431,6 +446,7 @@ async function updateProfile() {
             showMainPage = true;
             showFriendsPage = false;
             showChatScreen = false;
+            showAutoAdd = false;
             getUserData()
  
           }}>
@@ -442,6 +458,7 @@ async function updateProfile() {
           showMainPage = false;
           showFriendsPage = true;
           showChatScreen = false;
+          showAutoAdd = false;
           getUserData();
         }}>
           Friends
@@ -450,6 +467,18 @@ async function updateProfile() {
             <span class="new-chat-icon">({user_info.newChat.length})</span>
           {/if}
       {/if}
+        </button>
+
+        <button on:click={() => {
+          showProfilePage = false;
+          showMainPage = false;
+          showFriendsPage = false;
+          showChatScreen = false;
+          showAutoAdd = true;
+          getUserData();
+        }}>
+          Personal Agent
+
         </button>
 
       </nav>
@@ -492,7 +521,7 @@ async function updateProfile() {
       <label>Email:  {email}</label>
       <label>
         Full Name:
-        <input type="text" bind:value={newName} placeholder="Your name" />
+        <label>{fullName}<label>
       </label>
       <label>
         Age:
@@ -594,8 +623,11 @@ async function updateProfile() {
   </div>
 {/if}
 
-    
-  
+
+{#if showAutoAdd}
+  <h1>Activate your personal Agent to find profile automatically</h1>
+  <button on:click={autoAdd}>Engage </button>
+{/if}
     {#if isLoading}
     <div class="spinner-container">
         {#if isLoading&&showMainPage}

@@ -678,6 +678,60 @@ def retrieveChats():
     return jsonify(chat_data), 200
 
 
+@app.route("/autoAdd", methods=["POST"])
+def autoAdd():
+    data = request.get_json()
+    email = data["email"].lower()
+    docs = list(db.collection("Users").where("email", "==", email).stream())
+    if not docs:
+        return jsonify({"error": "User not found"}), 404
+
+    user_doc = docs[0]
+    user_data = user_doc.to_dict()
+
+    # Get current friend list (or initialize to empty list)
+    friends = user_data.get("friends", [])
+    age = user_data["age"]
+    gender = user_data["gender"]
+    input_binary = encode_input_to_binary(age, gender)
+
+    # Get all users from the database
+    all_users = list(db.collection("Users").stream())
+
+    for user in all_users:
+        other_data = user.to_dict()
+        if other_data["email"].lower() == email:
+            continue
+
+        other_email = other_data["email"]
+        other_name = other_data["name"]
+        age2 = other_data["age"]
+        gender2 = other_data["gender"]
+        input2 = encode_input_to_binary(age2, gender=gender2)
+
+        # Get a response based on the other user’s profile
+        response1 = agentResponse(input2, email, user_data["name"])
+        print("response 1", response1)
+        if response1== [1]:
+            
+            response2 = agentResponse(input_binary, other_email, other_name)
+            print("response 2", response2)
+            if response2==[1]:
+                print("match with: ", other_email)
+                if other_email not in friends:
+                    friends.append(other_email)
+                else:
+                    print("already friends")
+                
+                db.collection("Users").document(user.id).update({
+                    "friends": firestore.ArrayUnion([email])
+                })
+            
+  
+                db.collection("Users").document(user_doc.id).update({"friends": friends})
+
+    return jsonify({"message": "Auto friend addition complete", "friends": friends})
+
 @app.route('/')
 def home():
     return "Testing"
