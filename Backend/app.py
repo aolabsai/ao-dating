@@ -698,6 +698,7 @@ def autoAdd():
     # Get all users from the database
     all_users = list(db.collection("Users").stream())
 
+    new_friends = []
     for user in all_users:
         other_data = user.to_dict()
         if other_data["email"].lower() == email:
@@ -720,6 +721,7 @@ def autoAdd():
                 print("match with: ", other_email)
                 if other_email not in friends:
                     friends.append(other_email)
+                    new_friends.append(other_email)
                 else:
                     print("already friends")
                 
@@ -730,7 +732,7 @@ def autoAdd():
   
                 db.collection("Users").document(user_doc.id).update({"friends": friends})
 
-    return jsonify({"message": "Auto friend addition complete", "friends": friends})
+    return jsonify({"message": "Auto friend addition complete", "friends": new_friends})
 
 @app.route('/')
 def home():

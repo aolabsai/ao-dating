@@ -46,8 +46,10 @@
     let profileChanged = false
     let allMessages = [];
 
+    let autoAddedFriends = [];
+
     // Using the same backend endpoint 
-    const baseEndpoint = "http://127.0.0.1:5000"; // change to  http://127.0.0.1:5000 for local or https://aodating.onrender.com for staging
+    const baseEndpoint = "https://aodating.onrender.com"; // change to  http://127.0.0.1:5000 for local or https://aodating.onrender.com for staging
   
     function handlePhoto0Upload(event) {
         photo0= event.target.files[0];
@@ -263,7 +265,7 @@ async function updateProfile() {
           body: JSON.stringify(data),
       })
       const result = await response.json();
-      console.log(result.data)
+      autoAddedFriends = result["friends"]
     }
 
     async function retrieveChats(scroll=false) {
@@ -627,6 +629,12 @@ async function updateProfile() {
 {#if showAutoAdd}
   <h1>Activate your personal Agent to find profile automatically</h1>
   <button on:click={autoAdd}>Engage </button>
+  {#if autoAddedFriends}
+    <h1>We found these friends for you: </h1>
+    {#each autoAddedFriends as newFriends}
+      <li>{newFriends}</li>
+    {/each}
+  {/if}
 {/if}
     {#if isLoading}
     <div class="spinner-container">
