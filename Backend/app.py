@@ -60,12 +60,8 @@ google_client_secret = os.getenv("GOOGLE_CLIENT_SECRET")
 imgur_client_id = os.getenv("IMGUR_ID")
 
 aolabs_key = os.getenv("AOLABS_API_KEY")
-kennel_id = "aoDating1"
+kennel_id = "aoDating4"
 
-
-#to make new arch
-# message = ao.Arch(kennel_id, arch_i="[3, 2]", arch_z="[1]", connector_function="full_conn", api_key = aolabs_key)
-# print(message.text)
 
 cred = credentials.Certificate(firebase_sdk)
 firebase_admin.initialize_app(cred)
@@ -161,13 +157,45 @@ def encode_input_to_binary(age, gender):
     return input_to_agent
 
 def agentResponse(Input, email, name_of_agent):
+    arch = ao.Arch(arch_i="[3, 2]", arch_z="[1]", connector_function="full_conn", api_key = aolabs_key, kennel_id=kennel_id)
     email = email.lower()
 
     uid = name_of_agent+email
     Input = listTostring(Input)
-    Agent = ao.Agent(api_key=aolabs_key, kennel_id=kennel_id, uid=uid)
+    Agent = ao.Agent(Arch=arch, api_key=aolabs_key, uid=uid)
     response = Agent.next_state(Input)
-    return stringTolist(response["story"])
+
+    #dont even understand anything anymore about anything... dont ask 
+    z = response
+    print("agent response: ", response)
+    return z
+
+@app.route('/trainAgent', methods=["POST"])
+def trainAgent():
+    data = request.json
+    recommended_profile_info = data["info"]
+    label = data["label"]
+    uid = data["uid"]
+    user_email = data["email"]
+    print("rec: ", recommended_profile_info)
+    email = recommended_profile_info["email"]
+
+    age = recommended_profile_info["age"]
+    gender = recommended_profile_info["gender"]
+
+    arch = ao.Arch(arch_i="[3, 2]", arch_z="[1]", connector_function="full_conn", api_key = aolabs_key, kennel_id=kennel_id)
+    input_to_agent = encode_input_to_binary(int(age), gender)
+
+    Agent = ao.Agent(Arch=arch, api_key=aolabs_key, uid=uid)
+    if label == [1]:
+        addFriend(user_email, email)
+
+    print("training agent with label: ", label)
+
+
+    Agent.next_state(INPUT=input_to_agent, LABEL=label)
+    return jsonify({"message": "Training data saved successfully"}), 200
+
 
 @app.route("/getUserData", methods=["POST"])
 def getUserData():
@@ -341,33 +369,6 @@ def check_login():
             return jsonify({"error": "Invalid token"}), 401
     else:
         return jsonify({"status": "not_authenticated"}), 401
-
-
-@app.route('/trainAgent', methods=["POST"])
-def trainAgent():
-    data = request.json
-    recommended_profile_info = data["info"]
-    label = data["label"]
-    uid = data["uid"]
-    user_email = data["email"]
-    email = recommended_profile_info["email"]
-
-    age = recommended_profile_info["age"]
-    gender = recommended_profile_info["gender"]
-
-
-    input_to_agent = encode_input_to_binary(int(age), gender)
-
-    agent = ao.Agent(api_key=aolabs_key, kennel_id=kennel_id, uid=uid)
-    if label == [1]:
-        addFriend(user_email, email)
-
-    print("training agent with label: ", label)
-
-
-    agent.next_state(INPUT=input_to_agent, LABEL=label)
-    return jsonify({"message": "Training data saved successfully"}), 200
-
 
 def verify_password(email, password):
     url = f"https://identitytoolkit.googleapis.com/v1/accounts:signInWithPassword?key={firebase_apikey}"
