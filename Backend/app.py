@@ -165,7 +165,7 @@ def agentResponse(Input, email, name_of_agent):
     Agent = ao.Agent(Arch=arch, api_key=aolabs_key, uid=uid)
     response = Agent.next_state(Input)
 
-    #dont even understand anything anymore about anything... dont ask 
+    #dont even understand anything anymore about anything... dont ask, not sure why i cant just return response! 
     z = response
     print("agent response: ", response)
     return z
@@ -733,7 +733,7 @@ def autoAdd():
   
                 db.collection("Users").document(user_doc.id).update({"friends": friends})
 
-    return jsonify({"message": "Auto friend addition complete", "friends": new_friends})
+    return jsonify({"message": "Auto friend addition complete", "friends": new_friends}), 200
 
 @app.route('/')
 def home():

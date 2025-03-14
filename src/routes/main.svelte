@@ -47,6 +47,7 @@
     let allMessages = [];
 
     let autoAddedFriends = [];
+    let autoAddActivated = false;
 
     // Using the same backend endpoint 
     const baseEndpoint = "https://aodating.onrender.com"; // change to  http://127.0.0.1:5000 for local or https://aodating.onrender.com for staging
@@ -256,6 +257,8 @@ async function updateProfile() {
 
     }
     async function autoAdd() {
+      
+      isLoading = true
       const data =  {
         email:email
       }
@@ -266,6 +269,10 @@ async function updateProfile() {
       })
       const result = await response.json();
       autoAddedFriends = result["friends"]
+      if (response.status == 200)   {
+        isLoading = false
+        autoAddActivated= true
+      } 
     }
 
     async function retrieveChats(scroll=false) {
@@ -477,6 +484,8 @@ async function updateProfile() {
           showFriendsPage = false;
           showChatScreen = false;
           showAutoAdd = true;
+          autoAddActivated= false;
+          autoAddedFriends = [];  // hide previously added
           getUserData();
         }}>
           Personal Agent
@@ -629,11 +638,14 @@ async function updateProfile() {
 {#if showAutoAdd}
   <h1>Activate your personal Agent to find profile automatically</h1>
   <button on:click={autoAdd}>Engage </button>
-  {#if autoAddedFriends}
+  {#if autoAddActivated}
+  {#if autoAddedFriends.length !== 0}
     <h1>We found these friends for you: </h1>
     {#each autoAddedFriends as newFriends}
       <li>{newFriends}</li>
     {/each}
+    {:else}<h1>We couldn't find any new friends for you, please try again later</h1>
+  {/if}
   {/if}
 {/if}
     {#if isLoading}
