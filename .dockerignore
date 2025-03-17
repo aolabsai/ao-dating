@@ -5,7 +5,4 @@ README.md
 #don't need Backend in frontend image
 Backend/
 
-.env
-.env_build
-# .env.local
-.env.production
+.env*

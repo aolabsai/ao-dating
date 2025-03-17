@@ -1,5 +1,7 @@
 FROM node:23
 
+ARG VITE_BACKEND_URL
+
 WORKDIR /app
 
 # Copy package files and install dependencies
@@ -18,5 +20,7 @@ RUN npm run build
 # Install serve globally to serve the built app
 RUN npm install -g serve
 
+EXPOSE 5173
+
 # Default command to serve the build output
-CMD ["serve", "-s", "dist"]
+CMD ["serve", "-s", "dist", "-l",  "5173"]
