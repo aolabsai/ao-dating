@@ -7,6 +7,8 @@ services:
         # - linux/arm64
     ports:
       - "5000:5000"
+    env_file:
+      - .env
 
 
   frontend:
@@ -15,7 +17,11 @@ services:
       platforms:
         - linux/amd64
         # - linux/arm64
+      args:
+        VITE_BACKEND_URL: http://localhost:5000
+    env_file:
+      - .env
     ports:
       - "5173:5173"
-    depends_on:
-      - backend
+    # depends_on:
+    #   - backend
