@@ -3,7 +3,6 @@ from werkzeug.utils import secure_filename
 import jwt
 import datetime
 from datetime import datetime
-import google.auth.transport.requests
 from google.oauth2 import id_token
 from google_auth_oauthlib.flow import Flow
 from google.auth.transport.requests import Request
@@ -11,10 +10,6 @@ from google.auth.transport.requests import Request
 import random
 from openai import OpenAI
 import json
-import re
-import numpy as np
-import http.client
-from urllib.parse import quote
 
 import ao_pyth as ao
 
@@ -27,10 +22,8 @@ import google.auth
 from firebase_admin import credentials, auth
 import firebase_admin
 from firebase_admin import firestore
-import numpy as np
 import os
 import requests
-import time
 
 
 
