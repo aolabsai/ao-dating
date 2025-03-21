@@ -16,7 +16,7 @@ import numpy as np
 import http.client
 from urllib.parse import quote
 
-import ao_python.ao_python as ao
+import ao_pyth
 
 from dotenv import load_dotenv
 import embedding_bucketing.embedding_model_test as em
