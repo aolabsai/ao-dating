@@ -55,6 +55,25 @@ google_client_secret = os.getenv("GOOGLE_CLIENT_SECRET")
 
 imgur_client_id = os.getenv("IMGUR_ID")
 
+####temp test
+headers = {
+    "Authorization": f"Client-ID {imgur_client_id}"
+}
+
+# Make the request
+response = requests.get("https://api.imgur.com/3/credits", headers=headers)
+
+# Check if the request was successful
+if response.status_code == 200:
+    data = response.json()["data"]
+    print(f"User Limit: {data['UserLimit']}")
+    print(f"User Remaining: {data['UserRemaining']}")
+    print(f"User Reset Time (Unix Timestamp): {data['UserReset']}")
+    print(f"Client Limit: {data['ClientLimit']}")
+    print(f"Client Remaining: {data['ClientRemaining']}")
+else:
+    print(f"Error: {response.status_code}, {response.text}")
+
 aolabs_key = os.getenv("AOLABS_API_KEY")
 kennel_id = "aoDating4"
 
