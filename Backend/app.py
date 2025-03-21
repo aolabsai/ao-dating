@@ -451,7 +451,11 @@ def createAccount():
     if any(check_agent):
         return jsonify({"message": "User already exists"}), 400
 
-    doc_ref = db.collection('Users').add(User_info)
+    try:
+        doc_ref = db.collection('Users').add(User_info)  # Ensure Firestore entry succeeds
+    except Exception as e:
+        print(e)
+        return jsonify({"error": f"Firestore Error: {str(e)}"}), 500
 
     # Authentication logic
     password = request.form.get("password")
