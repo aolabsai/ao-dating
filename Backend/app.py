@@ -122,6 +122,7 @@ def upload_to_imgur(image_path):
     with open(image_path, "rb") as image_file:
         response = requests.post(url, headers=headers, files={"image": image_file})
 
+    print("response: ", response.json())
     try:
         return response.json().get("data", {}).get("link", [])
     except requests.exceptions.JSONDecodeError:
