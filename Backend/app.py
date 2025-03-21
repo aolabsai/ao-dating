@@ -123,7 +123,7 @@ def upload_to_imgur(image_path):
         response = requests.post(url, headers=headers, files={"image": image_file})
 
     try:
-        return response.json()["data"]["link"]
+        return response.json().get("data", {}).get("link", [])
     except requests.exceptions.JSONDecodeError:
         return "Error: Could not decode JSON response."
 
