@@ -19,12 +19,12 @@ import embedding_bucketing.embedding_model_test as em
 from flask_cors import CORS
 import google.auth
 
-from firebase_admin import credentials, auth
+from firebase_admin import credentials, auth, storage
 import firebase_admin
 from firebase_admin import firestore
 import os
 import requests
-
+import base64
 
 
 app = Flask(__name__)
@@ -53,26 +53,8 @@ JWT_ALGORITHM = 'HS256'
 google_client = os.getenv("GOOGLE_CLIENT_ID")
 google_client_secret = os.getenv("GOOGLE_CLIENT_SECRET")
 
-imgur_client_id = os.getenv("IMGUR_ID")
+imgbb_api = os.getenv("IMGBB_API_KEY")
 
-####temp test
-headers = {
-    "Authorization": f"Client-ID {imgur_client_id}"
-}
-
-# Make the request
-response = requests.get("https://api.imgur.com/3/credits", headers=headers)
-
-# Check if the request was successful
-if response.status_code == 200:
-    data = response.json()["data"]
-    print(f"User Limit: {data['UserLimit']}")
-    print(f"User Remaining: {data['UserRemaining']}")
-    print(f"User Reset Time (Unix Timestamp): {data['UserReset']}")
-    print(f"Client Limit: {data['ClientLimit']}")
-    print(f"Client Remaining: {data['ClientRemaining']}")
-else:
-    print(f"Error: {response.status_code}, {response.text}")
 
 aolabs_key = os.getenv("AOLABS_API_KEY")
 kennel_id = "aoDating4"
@@ -134,18 +116,20 @@ def generate_token(user_email):
     return token
 
 
-def upload_to_imgur(image_path):
-    url = "https://api.imgur.com/3/image"
-    headers = {"Authorization": f"Client-ID {imgur_client_id}"}
-
+def upload_image(image_path):
     with open(image_path, "rb") as image_file:
-        response = requests.post(url, headers=headers, files={"image": image_file})
-
-    print("response: ", response.json())
-    try:
-        return response.json().get("data", {}).get("link", [])
-    except requests.exceptions.JSONDecodeError:
-        return "Error: Could not decode JSON response."
+        encoded_image = base64.b64encode(image_file.read()).decode("utf-8")
+    payload = {
+        "key": imgbb_api,
+        "image": encoded_image,
+    }
+    response = requests.post("https://api.imgbb.com/1/upload", data=payload)
+    data = response.json()
+    if data.get("success"):
+        return data["data"]["url"]
+    else:
+        print("error uploading image")
+        return data
 
 def encode_input_to_binary(age, gender):
 
@@ -450,7 +434,7 @@ def createAccount():
             photo_path = os.path.join("uploads", filename)
             
             photo.save(photo_path)
-            photo_url = upload_to_imgur(photo_path)
+            photo_url = upload_image(photo_path)
         else:
             photo_url = ""
 
@@ -564,7 +548,7 @@ def updateProfile():
                 os.makedirs("uploads")
             photo_path = os.path.join("uploads", filename)
             photo.save(photo_path)
-            uploaded_url = upload_to_imgur(photo_path)
+            uploaded_url = upload_image(photo_path)
             new_photo_urls.append(uploaded_url)
     
     # Combine existing photo URLs with new photo URLs
