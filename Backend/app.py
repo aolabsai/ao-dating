@@ -25,6 +25,8 @@ from firebase_admin import firestore
 import os
 import requests
 import base64
+from apify_client import ApifyClient
+
 
 
 app = Flask(__name__)
@@ -55,19 +57,16 @@ google_client_secret = os.getenv("GOOGLE_CLIENT_SECRET")
 
 imgbb_api = os.getenv("IMGBB_API_KEY")
 
+apify_key = os.getenv("APIFY_API_KEY")
+client = ApifyClient(apify_key)
 
 aolabs_key = os.getenv("AOLABS_API_KEY")
-kennel_id = "aoDating4"
+kennel_id = "aoDating5-add_insta_tags_distance"
 
 
 cred = credentials.Certificate(firebase_sdk)
 firebase_admin.initialize_app(cred)
-
-
-
 db = firestore.client()
-
-
 flow = Flow.from_client_config(
     {
         "web": {
@@ -99,6 +98,53 @@ app.config["UPLOAD_FOLDER"] = UPLOAD_FOLDER
 # Ensure the upload folder exists
 os.makedirs(UPLOAD_FOLDER, exist_ok=True) 
 
+
+
+def genTags(handle):
+    run_input = {
+        "directUrls": [f"https://www.instagram.com/{handle}/"],
+        "resultsType": "posts",
+        "resultsLimit": 5,
+        "searchType": "hashtag",
+        "searchLimit": 1,
+        "addParentData": False,
+    }
+
+    run = client.actor("shu8hvrXbJbY3Eb9W").call(run_input=run_input)
+
+    caption_list = []
+    try:
+        for item in client.dataset(run["defaultDatasetId"]).iterate_items():
+            caption_list.append(item["caption"])
+    except Exception as e:
+        print(e)
+
+
+def processTags(tags):
+    messages = [
+        {
+            "role": "user",
+            "content": f"Give 2 words that describe these captions from Instagram: {tags}"
+        }
+    ]
+    
+    response = client.chat.completions.create(
+        model="gpt-3.5-turbo",
+        messages=messages
+    )
+    
+
+    text = response.choices[0].message.content
+    print("Full response:", text)
+    
+    words = text.split()
+    if len(words) >= 2:
+        a, b = words[0], words[1]
+    else:
+        print("Error")
+
+    return a, b
+
 def listTostring(s):
     return ''.join(map(str,s)) 
 
@@ -111,7 +157,6 @@ def generate_token(user_email):
         'exp': datetime.datetime.utcnow() + datetime.timedelta(hours=1)  # Token expires in 1 hour
     }
     token = jwt.encode(payload, app.config['SECRET_KEY'], algorithm='HS256')
-
 
     return token
 
@@ -131,7 +176,7 @@ def upload_image(image_path):
         print("error uploading image")
         return data
 
-def encode_input_to_binary(age, gender):
+def encode_input_to_binary(age, gender, distance):
 
     age = int(age)
     age_binary = []
@@ -152,12 +197,24 @@ def encode_input_to_binary(age, gender):
     else:
         gender_binary = [1,1]
 
+    distance_binary = []
 
-    input_to_agent = age_binary+gender_binary
+    if distance <0.3:
+        distance_binary = [1,1,1]
+    elif distance_binary < 0.7:
+        distance_binary = [1,1,0]
+    elif distance_binary < 1:
+        distance_binary = [1, 0, 0]
+    else:
+        distance_binary - [0,0,0]
+
+
+
+    input_to_agent = age_binary+gender_binary + distance_binary
     return input_to_agent
 
 def agentResponse(Input, email, name_of_agent):
-    arch = ao.Arch(arch_i="[3, 2]", arch_z="[1]", connector_function="full_conn", api_key = aolabs_key, kennel_id=kennel_id)
+    arch = ao.Arch(arch_i="[3, 2, 3]", arch_z="[1]", connector_function="full_conn", api_key = aolabs_key, kennel_id=kennel_id)
     email = email.lower()
 
     uid = name_of_agent+email
@@ -183,7 +240,7 @@ def trainAgent():
     age = recommended_profile_info["age"]
     gender = recommended_profile_info["gender"]
 
-    arch = ao.Arch(arch_i="[3, 2]", arch_z="[1]", connector_function="full_conn", api_key = aolabs_key, kennel_id=kennel_id)
+    arch = ao.Arch(arch_i="[3, 2, 3]", arch_z="[1]", connector_function="full_conn", api_key = aolabs_key, kennel_id=kennel_id)
     input_to_agent = encode_input_to_binary(int(age), gender)
 
     Agent = ao.Agent(Arch=arch, api_key=aolabs_key, uid=uid)
@@ -417,6 +474,12 @@ def createAccount():
     gender = request.form.get("gender")
     name = request.form.get("fullName")
     bio = request.form.get("bio")
+    handle = request.form.get("handle")
+
+    Info = genTags(handle)
+    Tags = processTags(Info)
+
+
 
     # Get the uploaded file from the request.files
     photos = request.files.getlist("photo")
@@ -447,7 +510,8 @@ def createAccount():
         "age": age,
         "gender": gender,
         "bio": bio,
-        "photo_url": photo_array
+        "photo_url": photo_array,
+        "Tags": Tags,
     }
     
     check_agent = db.collection('Users').where('email', '==', email).where('name', '==', name).stream()
@@ -480,6 +544,8 @@ def getProfile():
     name = user_info["name"]
     email = user_info["email"]
 
+    user_tags = user_info["tags"]
+
 
     agent_uid = name+email  #for ao labs agent
 
@@ -489,10 +555,18 @@ def getProfile():
 
     age = random_user["age"]
 
+    random_user_tags = random_user["tags"]
+    if user_tags and random_user_tags:
+        distance = em.nearest_word(user_tags, random_user_tags)  # calc cosine similarity between each users inst tags
+    else:
+        print("no tags")
+        distance = 0.75
+
+
     gender = random_user["gender"]
 
 
-    input_to_agent = encode_input_to_binary(int(age), gender)  #Recommending only on age and gender at the moment
+    input_to_agent = encode_input_to_binary(int(age), gender, int(distance))  
 
     response = agentResponse(input_to_agent, email, name)
 
