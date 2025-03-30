@@ -234,14 +234,22 @@ def trainAgent():
     label = data["label"]
     uid = data["uid"]
     user_email = data["email"]
+    user_tags = data.get("tags", [])
     print("rec: ", recommended_profile_info)
     email = recommended_profile_info["email"]
 
     age = recommended_profile_info["age"]
     gender = recommended_profile_info["gender"]
 
+    random_user_tags = recommended_profile_info.get("tags", [])
+    if user_tags and random_user_tags:
+        distance = em.nearest_word(user_tags, random_user_tags)  # calc cosine similarity between each users inst tags
+    else:
+        print("no tags")
+        distance = 0.75
+
     arch = ao.Arch(arch_i="[3, 2, 3]", arch_z="[1]", connector_function="full_conn", api_key = aolabs_key, kennel_id=kennel_id)
-    input_to_agent = encode_input_to_binary(int(age), gender)
+    input_to_agent = encode_input_to_binary(int(age), gender, int(distance))
 
     Agent = ao.Agent(Arch=arch, api_key=aolabs_key, uid=uid)
     if label == [1]:

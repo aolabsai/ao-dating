@@ -227,7 +227,8 @@ async function updateProfile() {
             info: recommended_profile_info, 
             label: label,
             uid: fullName+ email, 
-            email: email
+            email: email,
+            tags : user_info?.tags ?? []
         };
 
         try {
