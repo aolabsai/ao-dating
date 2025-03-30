@@ -58,7 +58,7 @@ google_client_secret = os.getenv("GOOGLE_CLIENT_SECRET")
 imgbb_api = os.getenv("IMGBB_API_KEY")
 
 apify_key = os.getenv("APIFY_API_KEY")
-client = ApifyClient(apify_key)
+aclient = ApifyClient(apify_key)
 
 aolabs_key = os.getenv("AOLABS_API_KEY")
 kennel_id = "aoDating5-add_insta_tags_distance"
@@ -110,11 +110,11 @@ def genTags(handle):
         "addParentData": False,
     }
 
-    run = client.actor("shu8hvrXbJbY3Eb9W").call(run_input=run_input)
+    run = aclient.actor("shu8hvrXbJbY3Eb9W").call(run_input=run_input)
 
     caption_list = []
     try:
-        for item in client.dataset(run["defaultDatasetId"]).iterate_items():
+        for item in aclient.dataset(run["defaultDatasetId"]).iterate_items():
             caption_list.append(item["caption"])
     except Exception as e:
         print(e)
@@ -477,7 +477,7 @@ def createAccount():
     handle = request.form.get("handle")
 
     Info = genTags(handle)
-    Tags = processTags(Info)
+    tags = processTags(Info)
 
 
 
@@ -511,7 +511,7 @@ def createAccount():
         "gender": gender,
         "bio": bio,
         "photo_url": photo_array,
-        "Tags": Tags,
+        "tags": tags,
     }
     
     check_agent = db.collection('Users').where('email', '==', email).where('name', '==', name).stream()
@@ -544,7 +544,9 @@ def getProfile():
     name = user_info["name"]
     email = user_info["email"]
 
-    user_tags = user_info["tags"]
+    user_tags = user_info.get("tags", [])
+
+    print("tags: ", user_tags)
 
 
     agent_uid = name+email  #for ao labs agent
@@ -555,7 +557,7 @@ def getProfile():
 
     age = random_user["age"]
 
-    random_user_tags = random_user["tags"]
+    random_user_tags = random_user.get("tags", [])
     if user_tags and random_user_tags:
         distance = em.nearest_word(user_tags, random_user_tags)  # calc cosine similarity between each users inst tags
     else:
@@ -578,7 +580,7 @@ def getProfile():
         gender = random_user["gender"]
 
 
-        input_to_agent = encode_input_to_binary(int(age), gender)
+        input_to_agent = encode_input_to_binary(int(age), gender, int(distance))
         response = agentResponse(input_to_agent, email, name)
         num_skipped_Users += 1
 
