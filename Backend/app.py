@@ -26,7 +26,7 @@ import os
 import requests
 import base64
 from apify_client import ApifyClient
-
+import time
 
 
 app = Flask(__name__)
@@ -214,12 +214,11 @@ def encode_input_to_binary(age, gender, distance):
     return input_to_agent
 
 def agentResponse(Input, email, name_of_agent):
-    arch = ao.Arch(arch_i="[3, 2, 3]", arch_z="[1]", connector_function="full_conn", api_key = aolabs_key, kennel_id=kennel_id)
     email = email.lower()
 
     uid = name_of_agent+email
     Input = listTostring(Input)
-    Agent = ao.Agent(Arch=arch, api_key=aolabs_key, uid=uid)
+    Agent = ao.Agent(kennel_id=kennel_id, api_key=aolabs_key, uid=uid, stage="dev")
     response = Agent.next_state(Input)
 
     #dont even understand anything anymore about anything... dont ask, not sure why i cant just return response! 
@@ -248,7 +247,6 @@ def trainAgent():
     uid = data["uid"]
     user_email = data["email"]
     user_tags = data.get("tags", [])
-    print("rec: ", recommended_profile_info)
     email = recommended_profile_info["email"]
 
     age = recommended_profile_info["age"]
@@ -260,18 +258,21 @@ def trainAgent():
     else:
         print("no tags")
         distance = 0.75
-
-    arch = ao.Arch(arch_i="[3, 2, 3]", arch_z="[1]", connector_function="full_conn", api_key = aolabs_key, kennel_id=kennel_id)
+    now = time.time()
     input_to_agent = encode_input_to_binary(int(age), gender, int(distance))
 
-    Agent = ao.Agent(Arch=arch, api_key=aolabs_key, uid=uid)
+    Agent = ao.Agent(kennel_id=kennel_id, api_key=aolabs_key, uid=uid, stage="dev")
     if label == [1]:
         addFriend(user_email, email)
 
     print("training agent with label: ", label)
 
-
+    
     Agent.next_state(INPUT=input_to_agent, LABEL=label)
+    later = time.time()
+    difference = int(later - now)
+    print("time delta: ", difference)
+
     return jsonify({"message": "Training data saved successfully"}), 200
 
 
