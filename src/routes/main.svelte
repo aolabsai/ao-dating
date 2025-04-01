@@ -13,6 +13,7 @@
     let gender = "";
     let location = "";
     let bio = "";
+    let insta_handle = "";
 
     let photo0 = ""
     let photo1 = "";
@@ -98,6 +99,7 @@
   formData.append("gender", gender);
   formData.append("location", location);
   formData.append("bio", bio);
+  formData.append("handle", insta_handle);
   photo_array.forEach(photo => {
   formData.append("photo", photo);
 });
@@ -225,7 +227,8 @@ async function updateProfile() {
             info: recommended_profile_info, 
             label: label,
             uid: fullName+ email, 
-            email: email
+            email: email,
+            tags : user_info?.tags ?? []
         };
 
         try {
@@ -244,7 +247,7 @@ async function updateProfile() {
         getProfile(); 
     }
 
-    async function getUserData() {  //place holder incase we need to get more current user data similar to how we retrieve chats
+    async function getUserData() {  
         const data = {
           email: email
         }
@@ -395,6 +398,10 @@ async function updateProfile() {
           <label>
             Bio:
             <textarea bind:value={bio} placeholder="Tell us about yourself"></textarea>
+          </label>
+          <label>
+            Instagram Handle (So we can see what you like):
+            <textarea bind:value={insta_handle} placeholder="handle"></textarea>
           </label>
           <button on:click={createAccount}>Create Account</button>
           <label>
