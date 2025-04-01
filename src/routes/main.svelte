@@ -53,7 +53,7 @@
     let autoAddActivated = false;
 
     // Using the same backend endpoint 
-    const baseEndpoint = "https://aodating.onrender.com"; // change to  http://127.0.0.1:5000 for local or https://aodating.onrender.com for staging
+    const baseEndpoint = "http://127.0.0.1:5000"; // change to  http://127.0.0.1:5000 for local or https://aodating.onrender.com for staging
     
   
     function handlePhoto0Upload(event) {
