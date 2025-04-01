@@ -566,7 +566,7 @@ def getProfile():
     name = user_info["name"]
     email = user_info["email"]
     local = False
-
+    users = []
 
     if os.path.isfile("cache.json"): #if local cache
         print("using local")
@@ -587,11 +587,6 @@ def getProfile():
 
 
     agent_uid = name+email  #for ao labs agent
-
-    users = list(db.collection("Users").stream())
-    random.shuffle(users)
-    random_user = users[0].to_dict()
-
 
     age = random_user["age"]
 
@@ -617,6 +612,7 @@ def getProfile():
             random_user = users[0].to_dict()
         else:
             random_user = users[0]
+        print("random user: ", random_user)
         age = random_user["age"]
         gender = random_user["gender"]
 
