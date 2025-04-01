@@ -99,7 +99,6 @@ app.config["UPLOAD_FOLDER"] = UPLOAD_FOLDER
 os.makedirs(UPLOAD_FOLDER, exist_ok=True) 
 
 
-
 def genTags(handle):
     run_input = {
         "directUrls": [f"https://www.instagram.com/{handle}/"],
@@ -144,6 +143,7 @@ def processTags(tags):
         print("Error")
 
     return a, b
+
 
 def listTostring(s):
     return ''.join(map(str,s)) 
@@ -226,6 +226,19 @@ def agentResponse(Input, email, name_of_agent):
     z = response
     print("agent response: ", response)
     return z
+
+
+def create_local_cache():
+    # Creates a temp json file when the user logs in, basically a copy of firebase database for users so we dont need to keep making calls 
+    all_users = list(db.collection("Users").stream())
+    all_users_list = []
+    for user in all_users:
+        all_users_list.append(user.to_dict())
+    try:
+        cache = open("cache.json", "r").read()
+    except Exception as e:
+        with open("cache.json", "w") as c:
+            json.dump(all_users_list, c)
 
 @app.route('/trainAgent', methods=["POST"])
 def trainAgent():
@@ -462,6 +475,7 @@ def login():
         user_info = user_list[0].to_dict()
 
     if user_data:
+        create_local_cache()
         return jsonify({"message": f"Welcome {email}!", "user_info": user_info}), 200
     else:
         return jsonify({"message": "Invalid email or password"}), 401
@@ -551,6 +565,21 @@ def getProfile():
     user_info = data.get("user_info", {})
     name = user_info["name"]
     email = user_info["email"]
+    local = False
+
+
+    if os.path.isfile("cache.json"): #if local cache
+        print("using local")
+        local = True
+        with open("cache.json") as c:
+            users = json.load(c)
+        random.shuffle(users)
+        random_user = users[0]
+    else: # if no local cache
+        print("no local")
+        users = list(db.collection("Users").stream())
+        random.shuffle(users)
+        random_user = users[0].to_dict()
 
     user_tags = user_info.get("tags", [])
 
@@ -562,6 +591,7 @@ def getProfile():
     users = list(db.collection("Users").stream())
     random.shuffle(users)
     random_user = users[0].to_dict()
+
 
     age = random_user["age"]
 
@@ -583,7 +613,10 @@ def getProfile():
     num_skipped_Users = 0
     while random_user["email"] == email or response == [0]:  
         random.shuffle(users)
-        random_user = users[0].to_dict()
+        if local == False:
+            random_user = users[0].to_dict()
+        else:
+            random_user = users[0]
         age = random_user["age"]
         gender = random_user["gender"]
 
