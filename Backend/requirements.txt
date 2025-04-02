@@ -14,6 +14,7 @@ python-dotenv
 firebase-admin
 requests
 gunicorn
+apify_client
 
 git+https://github.com/Rafipilot/embedding_bucketing
 git+https://github.com/aolabsai/ao_python
