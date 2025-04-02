@@ -264,8 +264,7 @@ async function updateProfile() {
 
     }
     async function autoAdd() {
-      
-      isLoading = true
+      alert("You have engaged your digital twin. It will talk to other twins in our databases and find matches, you will be emailed when we find new connections!");
       const data =  {
         email:email
       }
@@ -277,7 +276,6 @@ async function updateProfile() {
       const result = await response.json();
       autoAddedFriends = result["friends"]
       if (response.status == 200)   {
-        isLoading = false
         autoAddActivated= true
       } 
     }
