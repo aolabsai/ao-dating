@@ -862,8 +862,12 @@ def autoAdd():
     msg = MIMEMultipart()
     msg["From"] = email_address
     msg["To"] = email
-    msg["Subject"] = "YOUR auto_added friends"
-    msg.attach(MIMEText(f"We found these friends for you: {new_friends}, they have been automatically added to your friends list. Checkout back at aodating-1.onreader.com", "plain"))
+    msg["Subject"] = "We found new friends for you!"
+    friend_list = "\n".join(new_friends)
+    msg.attach(MIMEText(
+        f"We found these friends for you: {friend_list}. They have been automatically added to your friends list. Chat with them back at aodating-1.onreader.com", 
+        "plain"
+    ))
 
     SMTP_SERVER = "smtp.gmail.com" 
     SMTP_PORT = 587
