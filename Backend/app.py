@@ -28,6 +28,10 @@ import base64
 from apify_client import ApifyClient
 import time
 
+import smtplib
+from email.mime.text import MIMEText
+from email.mime.multipart import MIMEMultipart
+
 
 app = Flask(__name__)
 app.secret_key = "super_secret_key"
@@ -62,6 +66,9 @@ aclient = ApifyClient(apify_key)
 
 aolabs_key = os.getenv("AOLABS_API_KEY")
 kennel_id = "aoDating5-add_insta_tags_distance"
+
+email_address = os.getenv("EMAIL_ADDRESS")
+email_pass = os.getenv("EMAIL_PASSWORD")
 
 
 cred = credentials.Certificate(firebase_sdk)
@@ -201,9 +208,9 @@ def encode_input_to_binary(age, gender, distance):
 
     if distance <0.3:
         distance_binary = [1,1,1]
-    elif distance_binary < 0.7:
+    elif distance < 0.7:
         distance_binary = [1,1,0]
-    elif distance_binary < 1:
+    elif distance < 1:
         distance_binary = [1, 0, 0]
     else:
         distance_binary - [0,0,0]
@@ -812,7 +819,7 @@ def autoAdd():
     friends = user_data.get("friends", [])
     age = user_data["age"]
     gender = user_data["gender"]
-    input_binary = encode_input_to_binary(age, gender)
+    input_binary = encode_input_to_binary(age, gender, distance=0.75)
 
     # Get all users from the database
     all_users = list(db.collection("Users").stream())
@@ -827,7 +834,7 @@ def autoAdd():
         other_name = other_data["name"]
         age2 = other_data["age"]
         gender2 = other_data["gender"]
-        input2 = encode_input_to_binary(age2, gender=gender2)
+        input2 = encode_input_to_binary(age2, gender=gender2, distance = 0.75)
 
         # Get a response based on the other user’s profile
         response1 = agentResponse(input2, email, user_data["name"])
@@ -850,6 +857,33 @@ def autoAdd():
             
   
                 db.collection("Users").document(user_doc.id).update({"friends": friends})
+
+    # Create the email
+    msg = MIMEMultipart()
+    msg["From"] = email_address
+    msg["To"] = email
+    msg["Subject"] = "YOUR auto_added friends"
+    msg.attach(MIMEText(f"We found these friends for you: {new_friends}, they have been automatically added to your friends list. Checkout back at aodating-1.onreader.com", "plain"))
+
+    SMTP_SERVER = "smtp.gmail.com" 
+    SMTP_PORT = 587
+    try:
+        # Connect to SMTP server
+        server = smtplib.SMTP(SMTP_SERVER, SMTP_PORT)
+        server.starttls()  # Upgrade to secure connection
+        print("sign in: ", email_address, email_pass)
+        server.login(email_address, email_pass)
+        
+        # Send the email
+        server.sendmail(email_address, email, msg.as_string())
+        print("Email sent successfully to : ", email)
+
+    except Exception as e:
+        print(f"Error: {e}")
+
+    finally:
+        server.quit()
+
 
     return jsonify({"message": "Auto friend addition complete", "friends": new_friends}), 200
 
