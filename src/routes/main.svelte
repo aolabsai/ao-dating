@@ -3,7 +3,6 @@
     import { afterUpdate } from 'svelte';
 
     
-   // const baseEndpoint = import.meta.env.VITE_BACKEND_URL;
   
     // User info for both login and account creation
     let email = "";
@@ -54,8 +53,8 @@
     let autoAddActivated = false;
 
     // Using the same backend endpoint 
-    const baseEndpoint = "https://aodating.onrender.com"; // change to  http://127.0.0.1:5000 for local or https://aodating.onrender.com for staging
-    
+    // const baseEndpoint = "https://aodating.onrender.com"; // change to  http://127.0.0.1:5000 for local or https://aodating.onrender.com for staging
+    const baseEndpoint = import.meta.env.VITE_BACKEND_URL;
   
     function handlePhoto0Upload(event) {
         photo0= event.target.files[0];
