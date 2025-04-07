@@ -45,7 +45,7 @@ endpoint =  os.getenv("BACKEND_URL")
 # frontend_url = "https://giftrec.aolabs.ai"   #change to http://localhost:5174 for local and  https://giftrec.aolabs.ai for prod
 frontend_url = os.getenv("FRONTEND_URL")
 
-ao_endpoint_url = "https://api.aolabs.ai/v0dev/kennel/agent"
+ao_endpoint_url = "https://api.aolabs.ai/prod/kennel/agent"
 
 openai_key = os.getenv("OPENAI_KEY")
 rapid_key = os.getenv("RAPID_KEY")
@@ -225,7 +225,7 @@ def agentResponse(Input, email, name_of_agent):
 
     uid = name_of_agent+email
     Input = listTostring(Input)
-    Agent = ao.Agent(kennel_id=kennel_id, api_key=aolabs_key, uid=uid, stage="dev")
+    Agent = ao.Agent(kennel_id=kennel_id, api_key=aolabs_key, uid=uid, stage="prod")
     response = Agent.next_state(Input)
 
     #dont even understand anything anymore about anything... dont ask, not sure why i cant just return response! 
@@ -267,8 +267,7 @@ def trainAgent():
         distance = 0.75
     now = time.time()
     input_to_agent = encode_input_to_binary(int(age), gender, int(distance))
-
-    Agent = ao.Agent(kennel_id=kennel_id, api_key=aolabs_key, uid=uid, stage="dev")
+    Agent = ao.Agent(kennel_id=kennel_id, api_key=aolabs_key, uid=uid, stage="prod")
     if label == [1]:
         addFriend(user_email, email)
 
